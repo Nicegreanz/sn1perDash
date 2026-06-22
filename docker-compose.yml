@@ -1,0 +1,63 @@
+services:
+
+  sn1per:
+    image: xer0dayz/sn1per
+    container_name: sn1per
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./loot:/usr/share/sniper/loot/workspace   # sn1per writes reports here
+    networks:
+      - sniper-net
+
+  python-parser:
+    build:
+      context: ./parser
+      dockerfile: Dockerfile
+    container_name: python-parser
+    volumes:
+      - ./loot:/loot       # reads sn1per reports
+      - ./output:/output   # writes AI analysis for html-maker
+    depends_on:
+      - ollama
+    networks:
+      - sniper-net
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    volumes:
+      - ollama-models:/root/.ollama   # persists downloaded models
+    networks:
+      - sniper-net
+    restart: unless-stopped
+    # Uncomment if you have an NVIDIA GPU:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  html-maker:
+    build:
+      context: ./html-maker
+      dockerfile: Dockerfile
+    container_name: html-maker
+    volumes:
+      - ./output:/output   # reads AI analysis JSON
+      - ./reports:/reports # writes final HTML reports
+    depends_on:
+      - python-parser
+    networks:
+      - sniper-net
+    restart: unless-stopped
+
+volumes:
+  ollama-models:
+
+networks:
+  sniper-net:
+    driver: bridge

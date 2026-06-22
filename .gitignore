@@ -1,0 +1,16 @@
+# Scan data - do not commit
+loot/
+output/
+reports/
+
+# Docker
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
