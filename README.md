@@ -55,9 +55,44 @@ docker exec -it ollama ollama pull qwen2.5:7b
 
 ---
 
-## Usage
+## Running a scan
 
-Drop a Sn1per workspace folder into `loot/`:
+**1. Get a shell inside the Sn1per container:**
+
+```bash
+docker exec -it sn1per bash
+```
+
+**2. Run a scan against your target:**
+
+```bash
+sniper -t <target> -o -re
+```
+
+Example:
+```bash
+sniper -t 192.168.1.1 -o -re
+```
+
+**Common scan modes:**
+
+| Flag | Description |
+|---|---|
+| `-t <target>` | IP address or domain to scan |
+| `-o` | Save output to loot folder |
+| `-re` | Generate vulnerability report |
+| `-m stealth` | Stealth mode — slower, less noise |
+| `-m normal` | Normal mode (default) |
+| `-m fullportonly` | Scan all 65535 ports |
+
+**3. Wait for the pipeline.**
+Once the scan finishes, the parser and html-maker run automatically. Your report appears in `reports/<target>-report.html`.
+
+---
+
+## Dropping existing reports
+
+You can also drop a Sn1per workspace folder directly into `loot/` and the pipeline picks it up:
 
 ```
 loot/
@@ -65,8 +100,6 @@ loot/
     └── vulnerabilities/
         └── vulnerability-report-*.txt
 ```
-
-The pipeline picks it up automatically. Reports appear in `reports/` as `<target>-report.html`.
 
 ---
 
